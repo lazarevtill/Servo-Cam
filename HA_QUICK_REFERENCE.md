@@ -4,11 +4,9 @@ Fast lookup guide for common tasks.
 
 ## Installation
 
-```bash
-./install_ha_integration.sh
-# Then restart Home Assistant
-# Add via UI: Settings → Devices & Services → + Add Integration
-```
+1. **Add repository**: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
+2. **Install & start**: Select **Servo Cam** → Install → Start (optionally enable auto-start/watchdog)
+3. **Confirm discovery**: Keep `python3 main.py` or the add-on running so Zeroconf stays online, then accept the "New device discovered" prompt
 
 ## Entity IDs
 
@@ -285,7 +283,7 @@ Default connection:
 
 ---
 
-**Quick Start**: `./install_ha_integration.sh` → Restart HA → Add Integration → Enter Pi IP
+**Quick Start**: Add repo `https://github.com/lazarevtill/Servo-Cam` → Install & start add-on → Accept discovery prompt
 
 **Common Use**: Turn on monitoring switch → Camera starts → View in dashboard → Move with presets
 
