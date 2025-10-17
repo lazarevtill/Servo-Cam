@@ -1,0 +1,28 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Servo Security Camera",
+        "description": "Enter the connection details for your Servo Camera system",
+        "data": {
+          "host": "Host",
+          "port": "Port"
+        }
+      },
+      "confirm": {
+        "title": "Servo Camera discovered",
+        "description": "Do you want to set up the Servo Camera at {host}:{port}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the camera system",
+      "timeout_connect": "Timeout while connecting to the camera system",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This camera system is already configured",
+      "not_servo_cam": "The discovered device is not a Servo Camera",
+      "unknown": "Unexpected error occurred"
+    }
+  }
+}

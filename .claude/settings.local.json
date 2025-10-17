@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(python3:*)",
+      "Read(//dev/**)",
+      "Bash(source venv/bin/activate)",
+      "Bash(timeout 10 python3:*)",
+      "Bash(v4l2-ctl:*)",
+      "Bash(dpkg:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout 15 python3:*)",
+      "Bash(git rm:*)",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "WebFetch(domain:developers.home-assistant.io)",
+      "Bash(awk:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

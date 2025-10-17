@@ -1,0 +1,18 @@
+{
+  "domain": "servo_cam",
+  "name": "Servo Security Camera",
+  "version": "1.0.0",
+  "documentation": "https://github.com/lazarevtill/servo-cam",
+  "codeowners": ["@lazarevtill"],
+  "requirements": ["aiohttp>=3.8.0"],
+  "dependencies": [],
+  "config_flow": true,
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "zeroconf": [
+    {
+      "type": "_servo-cam._tcp.local.",
+      "name": "Servo Camera*"
+    }
+  ]
+}

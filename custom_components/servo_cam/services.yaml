@@ -1,0 +1,58 @@
+move_servo:
+  name: Move servo
+  description: Move the camera to a specific pan and tilt angle
+  fields:
+    pan:
+      name: Pan angle
+      description: Pan angle in degrees (0-180)
+      required: true
+      example: 90
+      selector:
+        number:
+          min: 0
+          max: 180
+          unit_of_measurement: "°"
+    tilt:
+      name: Tilt angle
+      description: Tilt angle in degrees (0-180)
+      required: true
+      example: 165
+      selector:
+        number:
+          min: 0
+          max: 180
+          unit_of_measurement: "°"
+
+preset_position:
+  name: Move to preset position
+  description: Move camera to a predefined preset position
+  fields:
+    position:
+      name: Position
+      description: Preset position name
+      required: true
+      example: center
+      selector:
+        select:
+          options:
+            - center
+            - left
+            - right
+            - up
+            - down
+            - top_left
+            - top_right
+            - bottom_left
+            - bottom_right
+
+start_patrol:
+  name: Start patrol
+  description: Start autonomous patrol mode through predefined positions
+
+stop_patrol:
+  name: Stop patrol
+  description: Stop autonomous patrol mode
+
+center_camera:
+  name: Center camera
+  description: Move camera to center position (90°, 165°)

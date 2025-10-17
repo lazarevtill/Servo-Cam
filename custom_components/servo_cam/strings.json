@@ -1,0 +1,89 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Servo Security Camera",
+        "description": "Enter the connection details for your Servo Camera system",
+        "data": {
+          "host": "Host",
+          "port": "Port"
+        }
+      },
+      "confirm": {
+        "title": "Servo Camera discovered",
+        "description": "Do you want to set up the Servo Camera at {host}:{port}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the camera system",
+      "timeout_connect": "Timeout while connecting to the camera system",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This camera system is already configured",
+      "not_servo_cam": "The discovered device is not a Servo Camera",
+      "unknown": "Unexpected error occurred"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pan_angle": {
+        "name": "Pan angle"
+      },
+      "tilt_angle": {
+        "name": "Tilt angle"
+      },
+      "motion_count": {
+        "name": "Motion detections"
+      },
+      "webhook_count": {
+        "name": "Alerts sent"
+      },
+      "session_duration": {
+        "name": "Session duration"
+      },
+      "frame_count": {
+        "name": "Frames processed"
+      },
+      "last_motion_classification": {
+        "name": "Last motion classification"
+      },
+      "last_motion_threat": {
+        "name": "Last motion threat level"
+      },
+      "webhook_queue": {
+        "name": "Alert queue size"
+      }
+    },
+    "binary_sensor": {
+      "monitoring_active": {
+        "name": "Monitoring active"
+      },
+      "patrol_active": {
+        "name": "Patrol active"
+      },
+      "servo_connected": {
+        "name": "Servo connected"
+      },
+      "camera_active": {
+        "name": "Camera active"
+      },
+      "motion_detected": {
+        "name": "Motion detected"
+      }
+    },
+    "switch": {
+      "monitoring": {
+        "name": "Monitoring"
+      },
+      "patrol": {
+        "name": "Patrol mode"
+      }
+    },
+    "camera": {
+      "servo_cam": {
+        "name": "Servo security camera"
+      }
+    }
+  }
+}
