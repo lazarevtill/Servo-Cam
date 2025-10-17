@@ -1,0 +1,10 @@
+{
+  "build_from": {
+    "aarch64": "ghcr.io/home-assistant/aarch64-base-python:3.12-bookworm",
+    "amd64": "ghcr.io/home-assistant/amd64-base-python:3.12-bookworm",
+    "armv7": "ghcr.io/home-assistant/armv7-base-python:3.12-bookworm"
+  },
+  "args": {
+    "PIP_ROOT_USER_ACTION": "ignore"
+  }
+}
