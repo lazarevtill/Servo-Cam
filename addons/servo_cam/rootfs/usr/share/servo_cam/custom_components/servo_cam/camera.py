@@ -77,10 +77,19 @@ class ServoCameraEntity(CoordinatorEntity[ServoCamCoordinator], Camera):
             ATTR_PAN_ANGLE: data.get("current_pan", 0),
             ATTR_TILT_ANGLE: data.get("current_tilt", 0),
             "servo_connected": data.get("servo_connected", False),
+            "monitoring_active": data.get("monitoring_active", False),
+            "patrol_enabled": data.get("patrol_enabled", False),
+            "patrol_active": data.get("patrol_active", False),
             "frame_count": data.get("frame_count", 0),
             "motion_count": data.get("motion_count", 0),
             "webhook_count": data.get("webhooks_sent", 0),
             "session_duration": data.get("session_duration", 0),
+            "webhook_queue_size": data.get("webhook_queue_size", 0),
+            "motion_detected": data.get("motion_detected", False),
+            "recent_motion_events": data.get("recent_motion_events", 0),
+            "recent_motions": data.get("recent_motions", []),
+            "last_motion_timestamp": data.get("last_motion_timestamp"),
+            "patrol_positions": data.get("patrol_positions", 0),
         }
 
     async def async_camera_image(

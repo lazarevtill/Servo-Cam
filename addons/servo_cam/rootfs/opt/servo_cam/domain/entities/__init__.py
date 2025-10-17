@@ -74,6 +74,8 @@ class ServoController:
 class MonitoringSession:
     """Monitoring session entity tracking security monitoring state"""
 
+    _MOTION_HISTORY_LIMIT = 50
+
     def __init__(self, webhook_url: str, angle_threshold: float):
         self.id = datetime.now().timestamp()
         self.webhook_url = webhook_url
@@ -83,6 +85,7 @@ class MonitoringSession:
         self.stopped_at: Optional[datetime] = None
         self.motion_events: List[MotionDetection] = []
         self.webhook_sent_count = 0
+        self.last_motion_at: Optional[datetime] = None
 
     def start(self):
         """Start monitoring session"""
@@ -100,6 +103,9 @@ class MonitoringSession:
         """Record a motion detection event"""
         if self.is_active:
             self.motion_events.append(motion)
+            if len(self.motion_events) > self._MOTION_HISTORY_LIMIT:
+                self.motion_events.pop(0)
+            self.last_motion_at = motion.timestamp
 
     def record_webhook_sent(self):
         """Record that a webhook was sent"""
@@ -112,20 +118,49 @@ class MonitoringSession:
             end_time = self.stopped_at or datetime.now()
             duration = (end_time - self.started_at).total_seconds()
 
-        recent_motions = [
-            m for m in self.motion_events
-            if (datetime.now() - m.timestamp).total_seconds() < 60
+        now = datetime.now()
+        recent_window = 60  # seconds
+        recent_motions_raw = [
+            motion for motion in self.motion_events
+            if (now - motion.timestamp).total_seconds() < recent_window
         ]
+        recent_motions = [self._serialize_motion(motion) for motion in recent_motions_raw]
+        last_motion = self.motion_events[-1] if self.motion_events else None
 
         return {
             "session_id": self.id,
             "is_active": self.is_active,
             "duration_seconds": round(duration, 1),
+            "session_duration": round(duration, 1),
             "total_motion_events": len(self.motion_events),
+            "motion_count": len(self.motion_events),
             "recent_motion_events": len(recent_motions),
             "webhooks_sent": self.webhook_sent_count,
+            "recent_motions": recent_motions,
+            "motion_detected": bool(recent_motions_raw),
+            "last_motion_timestamp": last_motion.timestamp.isoformat() if last_motion else None,
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "stopped_at": self.stopped_at.isoformat() if self.stopped_at else None
+        }
+
+    @staticmethod
+    def _serialize_motion(motion: MotionDetection) -> dict:
+        """Convert MotionDetection to a serializable dictionary"""
+        return {
+            "timestamp": motion.timestamp.isoformat(),
+            "confidence": round(motion.confidence, 3),
+            "threat_level": round(motion.threat_level, 3),
+            "classification": motion.classification,
+            "speed": round(motion.speed, 2),
+            "area": motion.area,
+            "center_x": motion.center_x,
+            "center_y": motion.center_y,
+            "bbox": {
+                "x": motion.bbox_x,
+                "y": motion.bbox_y,
+                "width": motion.bbox_width,
+                "height": motion.bbox_height,
+            },
         }
 
 

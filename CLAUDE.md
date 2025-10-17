@@ -99,8 +99,8 @@ python3 main.py
 
 ### Production (systemd)
 ```bash
-sudo systemctl start security-cam
-sudo journalctl -u security-cam -f  # View logs
+sudo systemctl start servo-cam.service
+sudo journalctl -fu servo-cam.service  # View logs
 ```
 
 ### Testing Individual Components
@@ -118,7 +118,7 @@ curl -X POST http://localhost:5000/status
 ## Configuration Management
 
 **Primary source**: `config/settings.py` (class-based settings)
-**Override mechanism**: Environment variables take precedence
+**Override mechanism**: `/etc/servo_cam/servo_cam.env` (created by `install.sh`) or environment variables
 
 Key settings:
 - `CAMERA_FLIP_HORIZONTAL/VERTICAL`: Applied in camera repositories (lines 112-121 in picamera_repository.py)

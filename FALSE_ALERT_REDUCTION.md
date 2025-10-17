@@ -277,7 +277,7 @@ export SCENE_DIFF_MIN_RATIO=0.05
 
 ```bash
 # Monitor system logs for classification accuracy
-sudo journalctl -u security-cam -f | grep "classification"
+sudo journalctl -fu servo-cam.service | grep "classification"
 
 # Check webhook priority distribution
 curl http://localhost:5000/status

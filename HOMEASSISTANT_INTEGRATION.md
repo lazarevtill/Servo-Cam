@@ -55,7 +55,7 @@ systemctl restart home-assistant@homeassistant
 
 ### 3. Add Integration via UI
 
-1. Keep `python3 main.py` running so the Zeroconf advertisement stays online.
+1. Ensure the Servo Cam backend is running (Home Assistant add-on, `servo-cam.service`, or `python3 main.py` during development) so Zeroconf stays online.
 2. Navigate to **Settings** → **Devices & Services** in Home Assistant.
 3. A **"New device discovered"** prompt for **Servo Security Camera** should appear automatically. Click **Configure**.
 4. If you dismiss the prompt, click **+ Add Integration** and search for "Servo Security Camera".
@@ -128,10 +128,17 @@ The integration communicates with these endpoints:
 pan_angle: 90.0
 tilt_angle: 165.0
 servo_connected: true
+monitoring_active: true
+patrol_enabled: true
+patrol_active: true
 frame_count: 12345
 motion_count: 42
 webhook_count: 8
+webhook_queue_size: 1
 session_duration: 3600
+motion_detected: true
+recent_motion_events: 3
+last_motion_timestamp: "2025-10-17T12:34:56"
 ```
 
 ### Sensors
@@ -562,7 +569,7 @@ CAMERA_FPS = 10  # Lower from 15
 **Symptom**: "Cannot connect" error during setup
 
 **Solutions**:
-- Verify servo-cam is running: `systemctl status security-cam`
+- Verify servo-cam is running: `systemctl status servo-cam.service`
 - Test API directly: `curl http://<ip>:5000/healthz`
 - Check firewall: `sudo ufw allow 5000`
 - Verify network connectivity between HA and Pi
@@ -575,7 +582,7 @@ CAMERA_FPS = 10  # Lower from 15
 - Ensure monitoring is ON: `switch.servo_cam_monitoring`
 - Check camera is active: `binary_sensor.servo_cam_camera_active`
 - Test stream directly: `http://<ip>:5000/video_feed`
-- Review servo-cam logs: `journalctl -u security-cam -f`
+- Review servo-cam logs: `journalctl -fu servo-cam.service`
 
 #### 4. Entities Not Updating
 

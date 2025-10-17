@@ -106,20 +106,45 @@ See **[HOMEASSISTANT_INTEGRATION.md](HOMEASSISTANT_INTEGRATION.md)** for complet
 
 ## 📦 Standalone Installation
 
-### Quick Start
+### Automated Setup (Recommended)
 
 ```bash
-# Clone the repository
+chmod +x install.sh
+./install.sh
+```
+
+The installer:
+
+- Installs system dependencies optimized for Raspberry Pi (Picamera2, OpenCV, I²C tools)
+- Creates a dedicated Python virtual environment in `.venv`
+- Installs all Python requirements
+- Generates `/etc/servo_cam/servo_cam.env` for runtime overrides (e.g. webhook URL)
+- Registers and starts the `servo-cam.service` systemd unit
+
+After the script finishes you can check the service with:
+
+```bash
+sudo systemctl status servo-cam.service
+sudo journalctl -fu servo-cam.service
+```
+
+Update `/etc/servo_cam/servo_cam.env` if you need to tweak ports or webhook targets, then restart the service.
+
+### Manual Installation
+
+Prefer the installer above for a hands-free setup. If you want to perform the steps manually, follow the same order:
+
+```bash
+# Clone the repository and enter it
 cd /root/servo-cam-main
 
 # Install system dependencies (Raspberry Pi OS/Debian)
 sudo apt-get update
 sudo apt-get install -y python3 python3-pip python3-venv \
-    i2c-tools libopencv-dev python3-opencv
+    python3-opencv i2c-tools libatlas-base-dev libjpeg-dev
 
-# Enable I2C
+# Enable I2C (raspi-config → Interface Options → I2C)
 sudo raspi-config
-# Interface Options → I2C → Enable
 
 # Create virtual environment
 python3 -m venv venv
@@ -133,9 +158,7 @@ mkdir -p ~/.homeassistant/custom_components
 cp -R custom_components/servo_cam ~/.homeassistant/custom_components/
 ```
 
-### Manual Installation
-
-The manual installation steps above mirror what the add-on container does during startup. When the add-on is available, prefer that route to keep the integration and backend in sync automatically.
+The manual steps mirror what the installer and add-on container perform. When running Home Assistant, the add-on keeps the backend and integration in sync automatically.
 
 ## 🚀 Usage
 
@@ -162,49 +185,50 @@ With the integration installed in Home Assistant, simply keep `python3 main.py` 
 
 ```bash
 # Enable service
-sudo systemctl enable security-cam
+sudo systemctl enable servo-cam.service
 
 # Start service
-sudo systemctl start security-cam
+sudo systemctl start servo-cam.service
 
 # Check status
-sudo systemctl status security-cam
+sudo systemctl status servo-cam.service
 
 # View logs
-sudo journalctl -u security-cam -f
+sudo journalctl -fu servo-cam.service
 ```
 
 ### Environment Configuration
 
-Create a `.env` file or set environment variables:
+The installer writes `/etc/servo_cam/servo_cam.env`, which is loaded by the `servo-cam.service`
+systemd unit on startup. Edit that file to override defaults:
 
 ```bash
-export WEBHOOK_URL="https://your-webhook-url.com/endpoint"
-export CAMERA_WIDTH=640
-export CAMERA_HEIGHT=480
-export CAMERA_FPS=20
-export MIN_AREA_RATIO=0.015
-export WEBHOOK_ANGLE_THRESHOLD=5.0
-export WEBHOOK_COOLDOWN=2.0
-export FLASK_PORT=5000
-export SCENE_BUCKET_DEGREES=5.0
-export SCENE_DIFF_PIXEL_THRESHOLD=25
-export SCENE_DIFF_MIN_RATIO=0.03
-export SCENE_DIFF_MEAN_THRESHOLD=0.06
-export SCENE_BASELINE_BLEND=0.2
-export SCENE_CHANGE_COOLDOWN=10
-export PATROL_ENABLED=true
-export MOTION_INTELLIGENCE_ENABLED=true
-export WEBHOOK_SEND_LOW_PRIORITY=false
-export WEBHOOK_SUPPRESS_ENVIRONMENTAL=true
-export PATROL_DWELL_TIME=3.0
-export PATROL_PAN_MIN=30.0
-export PATROL_PAN_MAX=150.0
-export PATROL_PAN_STEP=30.0
-export PATROL_TILT_MIN=150.0
-export PATROL_TILT_MAX=180.0
-export PATROL_TILT_STEP=15.0
+sudo nano /etc/servo_cam/servo_cam.env
 ```
+
+Example overrides:
+
+```env
+FLASK_PORT=5000
+WEBHOOK_URL=https://your-webhook-url.com/endpoint
+MOTION_INTELLIGENCE_ENABLED=true
+WEBHOOK_SEND_LOW_PRIORITY=false
+PATROL_ENABLED=true
+PATROL_DWELL_TIME=3.0
+PATROL_PAN_MIN=30.0
+PATROL_PAN_MAX=150.0
+PATROL_TILT_MIN=150.0
+PATROL_TILT_MAX=180.0
+```
+
+Apply changes with:
+
+```bash
+sudo systemctl restart servo-cam.service
+```
+
+For development outside the installer you can still export environment variables or create a
+`.env` file before launching `python3 main.py`.
 
 ## 🌐 API Endpoints
 
@@ -303,7 +327,9 @@ Sent when intelligent motion detection identifies a significant threat (person, 
 
 ## ⚙️ Configuration
 
-Edit `config/settings.py` to customize:
+For everyday tuning, add overrides to `/etc/servo_cam/servo_cam.env` and restart the `servo-cam`
+service. The values below live in `config/settings.py` and are useful when you need to change core
+defaults baked into the application or when running the app outside of systemd.
 
 ### Camera Settings
 ```python
@@ -418,7 +444,7 @@ CAMERA_HEIGHT = 240
 
 ```bash
 # If running as service
-sudo journalctl -u security-cam -f
+sudo journalctl -fu servo-cam.service
 
 # If running manually, check console output
 ```
@@ -516,7 +542,7 @@ Contributions welcome! Please ensure:
 
 For issues or questions:
 - Check troubleshooting section above
-- Review logs: `sudo journalctl -u security-cam -f`
+- Review logs: `sudo journalctl -fu servo-cam.service`
 - Test components individually (camera, I2C, servos)
 
 ## 📄 License

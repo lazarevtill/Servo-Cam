@@ -1,5 +1,5 @@
 name: Servo Cam
-version: "0.2.0"
+version: "0.3.0"
 slug: servo_cam
 description: Motorized security camera with automatic discovery and Home Assistant integration.
 url: https://github.com/lazarevtill/Servo-Cam

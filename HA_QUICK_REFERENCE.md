@@ -270,12 +270,12 @@ Default connection:
 
 1. Check logs: Settings → System → Logs
 2. Test API: `curl http://<ip>:5000/healthz`
-3. Verify servo-cam: `systemctl status security-cam`
+3. Verify servo-cam: `systemctl status servo-cam.service`
 4. Review integration status: Settings → Devices & Services
 
 ## Version Info
 
-- Integration version: **1.0.0**
+- Integration version: **1.1.0**
 - Domain: `servo_cam`
 - Platforms: camera, sensor, binary_sensor, switch
 - Update method: polling (1s)

@@ -98,7 +98,7 @@ Not supported - use UI configuration only.
 ### Camera
 
 - `camera.servo_security_camera` - Live MJPEG stream with snapshot support
-  - Attributes: `pan_angle`, `tilt_angle`, `servo_connected`, `frame_count`, `motion_count`, `webhook_count`, `session_duration`
+  - Attributes: `pan_angle`, `tilt_angle`, `servo_connected`, `monitoring_active`, `patrol_enabled`, `patrol_active`, `frame_count`, `motion_count`, `webhook_count`, `webhook_queue_size`, `session_duration`, `motion_detected`, `recent_motion_events`, `recent_motions`, `last_motion_timestamp`
 
 ### Sensors
 

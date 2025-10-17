@@ -1,66 +1,80 @@
 # 🚀 Quick Start Guide
 
-Get your security camera up and running in 5 minutes!
+Spin up the Servo Cam platform, expose it to Home Assistant, and verify everything in a few minutes.
 
 ## Prerequisites
 
-- Raspberry Pi (3B+ or newer) with Raspberry Pi OS
-- Camera module connected
-- PCA9685 servo controller wired
-- Internet connection
+- Raspberry Pi 3B+ (or newer) running Raspberry Pi OS
+- Camera module (CSI or USB) connected and enabled
+- PCA9685 servo controller wired to the servos
+- Network access for Home Assistant and webhook targets
 
-## Step 1: Installation
+## Step 1: Install the Backend
 
 1. **Home Assistant Add-on (Recommended)**
-   - Add repository: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
-   - Install & start the **Servo Cam** add-on (enable auto-start/watchdog if desired)
+   - Go to **Settings → Add-ons → Add-on Store**
+   - Click the **⋮** menu → **Repositories** → add `https://github.com/lazarevtill/Servo-Cam`
+   - Install and start the **Servo Cam** add-on (optional: enable auto-start/watchdog)
 
-2. **Manual on-device install (for development/standalone)**
-
+2. **On-device install (Raspberry Pi)**
    ```bash
-   cd /root/servo-cam-main
-   sudo apt-get update
-   sudo apt-get install -y python3 python3-pip python3-venv \
-        i2c-tools libopencv-dev python3-opencv
+   cd /home/pi/Servo-Cam               # adjust to your clone location
+   chmod +x install.sh
+   ./install.sh
+   ```
+   The installer:
+   - Installs all apt dependencies (Picamera2, OpenCV, I²C tools, etc.)
+   - Creates a Python virtual environment in `.venv`
+   - Installs Python requirements
+   - Writes `/etc/servo_cam/servo_cam.env` for runtime overrides
+   - Registers and starts the `servo-cam.service` systemd unit
 
+3. **Development-only workflow**
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y python3 python3-venv python3-opencv i2c-tools
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
+   Use this path only when you want to run `python3 main.py` manually from the shell.
 
-   Reboot after enabling I2C if prompted by `raspi-config`.
+## Step 2: Configure Runtime Settings
 
-## Step 2: Configuration
-
-Edit your webhook URL:
-
-```bash
-nano config/settings.py
-```
-
-Update line 63:
-```python
-WEBHOOK_URL = "https://your-webhook-url.com/endpoint"
-```
-
-Or use environment variable:
-```bash
-export WEBHOOK_URL="https://your-webhook-url.com/endpoint"
-```
-
-## Step 3: Test Run
+Edit the environment file created by the installer:
 
 ```bash
-source venv/bin/activate
-python3 main.py
+sudo nano /etc/servo_cam/servo_cam.env
 ```
 
-You should see:
-```
-============================================================
-SECURITY CAMERA SYSTEM
-============================================================
+Set overrides for your environment (example):
 
+```env
+WEBHOOK_URL=https://example.com/webhook
+FLASK_PORT=5000
+MOTION_INTELLIGENCE_ENABLED=true
+PATROL_ENABLED=true
+PATROL_DWELL_TIME=3.0
+```
+
+Reload the service when you are done:
+
+```bash
+sudo systemctl restart servo-cam.service
+```
+
+> Developing without systemd? Export the same variables in your shell before running `python3 main.py`.
+
+## Step 3: Verify the Service
+
+```bash
+sudo systemctl status servo-cam.service
+sudo journalctl -fu servo-cam.service
+```
+
+You should see the banner followed by:
+
+```
 ✓ Camera initialized
 ✓ Servos initialized and centered
 ✓ Motion detector initialized
@@ -69,127 +83,67 @@ SECURITY CAMERA SYSTEM
 🌐 Server starting on http://0.0.0.0:5000
 ```
 
-## Step 4: Access Web Interface
+## Step 4: Open the Web UI
 
-Open your browser:
-```
-http://<raspberry-pi-ip>:5000
-```
+Visit `http://<raspberry-pi-ip>:5000` and confirm:
+- Live MJPEG video feed
+- Monitoring toggle (should show **Monitoring Active** after you start it)
+- Servo manual controls and patrol status
 
-You should see:
-- Live video feed
-- Monitoring controls with toggle button
-- Servo manual controls with arrow buttons
+## Step 5: Link with Home Assistant
 
-## Step 5: Enable Monitoring
+- Keep the backend running (systemd service or manual session)
+- In Home Assistant, go to **Settings → Devices & Services**
+- Accept the **Servo Security Camera** Zeroconf prompt, or click **+ Add Integration** and search for it
+- Confirm host/port and finish the flow
 
-Click the **"Start Monitoring"** button in the web interface.
+The integration will create:
+- 1 camera entity (`camera.servo_security_camera`)
+- 9 sensors (angles, counts, queue size, threat info)
+- 5 binary sensors (monitoring, patrol, servo/camera connectivity, live motion)
+- 2 switches (monitoring, patrol)
+- 5 helper services (move_servo, preset_position, start/stop patrol, center_camera)
 
-The system will now:
-- Detect motion in the camera view (for overlays, intelligence, and webhook payloads)
-- Continue autonomous patrol scanning across the configured pan/tilt grid (servos do **not** follow motion targets)
-- Send webhooks when patrol movement exceeds the configured thresholds or when scene-change analysis flags a difference
-- Include a base64 snapshot with each webhook
-- Compare the live scene with stored baselines for that angle and alert on unexpected changes
+## Testing Checklist
 
-> 💡 **Home Assistant**: Leave `python3 main.py` (manual install) or the add-on running. Home Assistant will show a "New device discovered" prompt thanks to the Zeroconf broadcast. Accept it to create the integration entry instantly.
+### Servo Movement
+1. From the web UI, use the arrow buttons or sliders
+2. Confirm the servos move and return to center on command
 
-## Testing
+### Monitoring & Alerts
+1. Click **Start Monitoring**
+2. Move in front of the camera
+3. Watch the overlay for motion bounding boxes
+4. Tail the logs or webhook endpoint to confirm notifications
 
-### Test Servo Control
+### Home Assistant
+1. Ensure the camera entity streams (`camera_view: live`)
+2. Toggle `switch.servo_cam_monitoring` and see status update in the UI
+3. Call `servo_cam.preset_position` → `top_left` and confirm servo motion
 
-1. Use arrow buttons (◀ ◀◀ ▶ ▶▶) to move servos
-2. Verify servos respond
-3. Click "Center Servos" to return to center
+## Troubleshooting Quick Hits
 
-### Test Monitoring
+| Issue | Resolution |
+|-------|------------|
+| No video feed | `vcgencmd get_camera`, ensure Picamera2/OpenCV packages installed |
+| Servos idle | `sudo i2cdetect -y 1` (expect `0x40`), check wiring and power |
+| Webhooks missing | Verify URL in `/etc/servo_cam/servo_cam.env`, check `journalctl -fu servo-cam.service`, test with `curl` |
+| HA can't connect | Confirm `http://<pi-ip>:5000/healthz` returns JSON, firewall open |
 
-1. Click "Start Monitoring"
-2. Badge should change to "🔴 MONITORING ACTIVE"
-3. Move your hand in front of camera
-4. Watch the console or web UI overlay to confirm motion is detected (servos stay in patrol sequence)
-5. Check your webhook endpoint for notifications
-
-## Troubleshooting
-
-### No Video Feed
-
-```bash
-# Test camera
-vcgencmd get_camera
-
-# Check if picamera2 works
-python3 -c "from picamera2 import Picamera2; print('Camera OK')"
-```
-
-### Servos Not Moving
+## Service Controls
 
 ```bash
-# Check I2C devices
-sudo i2cdetect -y 1
-# Should show 0x40
-
-# Test I2C communication
-sudo i2cget -y 1 0x40 0x00
+sudo systemctl stop servo-cam.service
+sudo systemctl start servo-cam.service
+sudo systemctl restart servo-cam.service
+sudo journalctl -fu servo-cam.service
 ```
-
-### Webhook Not Sending
-
-1. Check webhook URL in config/settings.py
-2. Verify internet connection
-3. Check logs: `sudo journalctl -u security-cam -f`
-4. Test webhook manually:
-   ```bash
-   curl -X POST https://your-webhook-url.com/endpoint \
-        -H "Content-Type: application/json" \
-        -d '{"test": true}'
-   ```
-
-## Enable Auto-Start
-
-```bash
-sudo systemctl enable security-cam
-sudo systemctl start security-cam
-```
-
-Check status:
-```bash
-sudo systemctl status security-cam
-```
-
-## Key Features
-
-### Monitoring Toggle
-- **ON**: Motion detection, intelligent analysis, autonomous patrol, scene-change monitoring, and webhooks are active
-- **OFF**: Manual control only, no monitoring or webhooks
-
-### Manual Control
-- Arrow buttons: Move servos in small/large steps
-- Sliders: Precise angle control
-- Center button: Return to 90°/90° position
-
-### Webhook Triggers
-Webhooks are sent when:
-- Monitoring is active
-- Motion intelligence marks an event that meets the threat filters
-- Patrol movement changes pan/tilt angles by ≥5° (configurable)
-- The scene at the current servo angle differs from the stored baseline beyond configured thresholds
-- Includes base64-encoded snapshot
 
 ## Next Steps
 
-- Adjust motion sensitivity in config/settings.py
-- Change webhook angle threshold
-- Set up systemd service for auto-start
-- Integrate with Home Assistant, n8n, or other automation
-- Add multiple cameras (extend architecture)
+- Fine-tune patrol dwell, detection sensitivity, and webhook thresholds via the environment file
+- Build Home Assistant automations (examples in `HOMEASSISTANT_INTEGRATION.md` and `HA_QUICK_REFERENCE.md`)
+- Point webhooks to n8n, Home Assistant automations, or other incident pipelines
+- Explore the web UI to trigger snapshots, download logs, or deploy future features
 
-## Support
-
-- Full docs: See README.md
-- Logs: `sudo journalctl -u security-cam -f`
-- Issues: Check hardware connections and permissions
-
----
-
-**You're all set! Enjoy your security camera system! 🎉**
+You are up and running—enjoy your Servo Cam smart security platform! 🎉

@@ -123,6 +123,10 @@ class MonitoringService:
             self._patrol_last_motion_time = datetime.now()
             self._is_patrolling = False
             print(f"✓ Patrol mode enabled: {len(self._patrol_positions)} positions")
+        else:
+            self._is_patrolling = False
+            self._patrol_positions = []
+            self._patrol_index = 0
 
         print("✓ Monitoring started")
         return True
@@ -133,6 +137,8 @@ class MonitoringService:
             return False
 
         self.session.stop()
+        self._is_patrolling = False
+        self._patrol_position_start_time = None
         print("✓ Monitoring stopped")
         return True
 
@@ -211,16 +217,19 @@ class MonitoringService:
             return
 
         # Execute patrol logic (runs continuously when monitoring is active)
-        if settings.PATROL_ENABLED:
-            now = datetime.now()
+        if not settings.PATROL_ENABLED:
+            self._is_patrolling = False
+            return
 
-            if not self._is_patrolling:
-                # Start patrol mode
-                self._is_patrolling = True
-                self._patrol_position_start_time = now
-                print("→ Starting patrol mode")
+        now = datetime.now()
 
-            self._execute_patrol()
+        if not self._is_patrolling:
+            # Start patrol mode
+            self._is_patrolling = True
+            self._patrol_position_start_time = now
+            print("→ Starting patrol mode")
+
+        self._execute_patrol()
 
     def _track_target(self, frame: Frame):
         """Move servos to track motion target with smooth movement"""
@@ -428,7 +437,7 @@ class MonitoringService:
         """Get current system status"""
         stats = self.session.get_statistics() if self.session else {}
 
-        return {
+        status = {
             "camera_active": self.camera.is_active,
             "servo_connected": self.servo.is_connected,
             "monitoring_active": self.is_monitoring_active(),
@@ -436,8 +445,21 @@ class MonitoringService:
             "current_tilt": round(self.servo.current_position.tilt.degrees, 1),
             "frame_count": self.camera.frame_count,
             "webhook_queue_size": self.webhook_repo.get_queue_size(),
+            "patrol_enabled": settings.PATROL_ENABLED,
+            "patrol_active": self._is_patrolling and self.is_monitoring_active(),
+            "patrol_positions": len(self._patrol_positions),
             **stats
         }
+
+        # Ensure legacy aliases expected by Home Assistant integration
+        if "session_duration" not in status and "duration_seconds" in status:
+            status["session_duration"] = status["duration_seconds"]
+        if "motion_count" not in status and "total_motion_events" in status:
+            status["motion_count"] = status["total_motion_events"]
+        status.setdefault("recent_motions", [])
+        status.setdefault("motion_detected", False)
+
+        return status
 
     def shutdown(self):
         """Shutdown all components"""
