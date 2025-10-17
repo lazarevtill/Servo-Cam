@@ -1,0 +1,18 @@
+#!/usr/bin/with-contenv bashio
+set -euo pipefail
+
+export FLASK_HOST=0.0.0.0
+export FLASK_PORT=$(bashio::config 'flask_port')
+
+if bashio::config.true 'flask_debug'; then
+    export FLASK_DEBUG=true
+else
+    export FLASK_DEBUG=false
+fi
+
+if bashio::config.has_value 'webhook_url'; then
+    export WEBHOOK_URL=$(bashio::config 'webhook_url')
+fi
+
+bashio::log.info "Starting Servo Cam service on port ${FLASK_PORT}"
+exec python3 /opt/servo_cam/main.py

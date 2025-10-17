@@ -11,13 +11,24 @@ Get your security camera up and running in 5 minutes!
 
 ## Step 1: Installation
 
-```bash
-cd /root/servo-cam-main
-chmod +x install.sh
-./install.sh
-```
+1. **Home Assistant Add-on (Recommended)**
+   - Add repository: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
+   - Install & start the **Servo Cam** add-on (enable auto-start/watchdog if desired)
 
-Wait for installation to complete (5-10 minutes). Reboot if prompted.
+2. **Manual on-device install (for development/standalone)**
+
+   ```bash
+   cd /root/servo-cam-main
+   sudo apt-get update
+   sudo apt-get install -y python3 python3-pip python3-venv \
+        i2c-tools libopencv-dev python3-opencv
+
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+   Reboot after enabling I2C if prompted by `raspi-config`.
 
 ## Step 2: Configuration
 
@@ -52,8 +63,9 @@ SECURITY CAMERA SYSTEM
 
 ✓ Camera initialized
 ✓ Servos initialized and centered
-✓ Webhook notifications enabled
-...
+✓ Motion detector initialized
+✓ Webhook worker started
+✓ Zeroconf advertisement started
 🌐 Server starting on http://0.0.0.0:5000
 ```
 
@@ -74,11 +86,13 @@ You should see:
 Click the **"Start Monitoring"** button in the web interface.
 
 The system will now:
-- Detect motion in the camera view
-- Track objects with servos
-- Send webhooks when servos move significantly (>5°)
-- Include snapshot with each webhook
+- Detect motion in the camera view (for overlays, intelligence, and webhook payloads)
+- Continue autonomous patrol scanning across the configured pan/tilt grid (servos do **not** follow motion targets)
+- Send webhooks when patrol movement exceeds the configured thresholds or when scene-change analysis flags a difference
+- Include a base64 snapshot with each webhook
 - Compare the live scene with stored baselines for that angle and alert on unexpected changes
+
+> 💡 **Home Assistant**: Leave `python3 main.py` (manual install) or the add-on running. Home Assistant will show a "New device discovered" prompt thanks to the Zeroconf broadcast. Accept it to create the integration entry instantly.
 
 ## Testing
 
@@ -93,7 +107,7 @@ The system will now:
 1. Click "Start Monitoring"
 2. Badge should change to "🔴 MONITORING ACTIVE"
 3. Move your hand in front of camera
-4. Servos should track the movement
+4. Watch the console or web UI overlay to confirm motion is detected (servos stay in patrol sequence)
 5. Check your webhook endpoint for notifications
 
 ## Troubleshooting
@@ -146,8 +160,8 @@ sudo systemctl status security-cam
 ## Key Features
 
 ### Monitoring Toggle
-- **ON**: Motion tracking active, webhooks sent on servo movement
-- **OFF**: Manual control only, no webhooks
+- **ON**: Motion detection, intelligent analysis, autonomous patrol, scene-change monitoring, and webhooks are active
+- **OFF**: Manual control only, no monitoring or webhooks
 
 ### Manual Control
 - Arrow buttons: Move servos in small/large steps
@@ -157,8 +171,8 @@ sudo systemctl status security-cam
 ### Webhook Triggers
 Webhooks are sent when:
 - Monitoring is active
-- Motion is detected
-- Servo angle changes by ≥5° (configurable)
+- Motion intelligence marks an event that meets the threat filters
+- Patrol movement changes pan/tilt angles by ≥5° (configurable)
 - The scene at the current servo angle differs from the stored baseline beyond configured thresholds
 - Includes base64-encoded snapshot
 
