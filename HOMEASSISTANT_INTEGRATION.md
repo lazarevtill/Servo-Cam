@@ -17,33 +17,21 @@ This integration provides full control and monitoring of your Servo Security Cam
 
 ### 1. Install the Integration
 
-#### Option A: Home Assistant Add-on (Recommended)
-
-1. Go to **Settings → Add-ons → Add-on Store**.
-2. Open the **⋮** menu → **Repositories** and add `https://github.com/lazarevtill/Servo-Cam`.
-3. Select **Servo Cam** → **Install** → **Start** (enable auto-start/watchdog if desired).
-
-> ⚙️ **Add-on modes**: `mode: local` (default) runs the backend inside Home Assistant OS/Supervised on Raspberry Pi (ARM). For x86/other hosts, set `mode: remote`, provide the Raspberry Pi address/port (where `install.sh` was executed), and the add-on will proxy the remote backend while keeping the integration updated.
-
-The add-on automatically copies the integration into `/config/custom_components/servo_cam` on every boot and keeps the backend service running.
-
-##### Add-on configuration options
-
-| Option | Description |
-|--------|-------------|
-| `mode` | `local` (run backend inside add-on) or `remote` (proxy to existing Raspberry Pi backend) |
-| `flask_port` | Port exposed by the add-on container (default 5000) |
-| `remote_host` | Hostname/IP of the Raspberry Pi when using remote mode |
-| `remote_port` | Remote backend port (default 5000) |
-| `remote_scheme` | `http` (default) or `https` when reverse proxying a secured backend |
-| `webhook_url` | Optional override for webhook target when running in local mode |
-
-#### Option B: Manual Filesystem Installation
+#### Option A: Manual Filesystem Installation (Recommended)
 
 ```bash
 # From the servo-cam directory
 cp -r custom_components/servo_cam /path/to/homeassistant/custom_components/
 ```
+
+After copying, restart Home Assistant so it loads the new integration.
+
+#### Option B: HACS Custom Repository
+
+1. Ensure [HACS](https://hacs.xyz/) is installed.
+2. Open HACS → Integrations → ⋮ → **Custom repositories**.
+3. Add `https://github.com/lazarevtill/Servo-Cam` with category **Integration**.
+4. Install **Servo Security Camera** from HACS and restart Home Assistant.
 
 #### Option C: Symlink (Development)
 
@@ -53,7 +41,9 @@ cd custom_components
 ln -s /root/servo-cam-main/custom_components/servo_cam servo_cam
 ```
 
-### 2. Restart Home Assistant or Start the Add-on
+Restart Home Assistant after adding the symlink.
+
+### 2. Restart Home Assistant
 
 ```bash
 # Docker
@@ -68,7 +58,7 @@ systemctl restart home-assistant@homeassistant
 
 ### 3. Add Integration via UI
 
-1. Ensure the Servo Cam backend is running (Home Assistant add-on, `servo-cam.service`, or `python3 main.py` during development) so Zeroconf stays online.
+1. Ensure the Servo Cam backend is running (`servo-cam.service` or `python3 main.py` during development) so Zeroconf stays online.
 2. Navigate to **Settings** → **Devices & Services** in Home Assistant.
 3. A **"New device discovered"** prompt for **Servo Security Camera** should appear automatically. Click **Configure**.
 4. If you dismiss the prompt, click **+ Add Integration** and search for "Servo Security Camera".

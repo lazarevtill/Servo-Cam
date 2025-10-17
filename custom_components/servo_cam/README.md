@@ -45,14 +45,15 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
 
 ## Installation
 
-### Method 1: Home Assistant Add-on (Recommended)
+### Method 1: Manual Installation (Recommended)
 
-1. Settings → Add-ons → Add-on Store → ⋮ → Repositories
-2. Add `https://github.com/lazarevtill/Servo-Cam`
-3. Install and start the **Servo Cam** add-on (enable auto-start/watchdog as desired)
-4. The add-on copies this integration into `/config/custom_components/servo_cam` automatically on every boot
-
-> Add-on modes: use `local` on Home Assistant OS/Supervised for Raspberry Pi (ARM). For other Home Assistant platforms (e.g., x86/NUC), choose `remote` in the add-on options and point it to the Raspberry Pi where `install.sh` deployed the backend.
+1. Copy the `custom_components/servo_cam` directory to your Home Assistant `custom_components` folder:
+   ```bash
+   cd /path/to/homeassistant
+   mkdir -p custom_components
+   cp -r /path/to/servo-cam/custom_components/servo_cam custom_components/
+   ```
+2. Restart Home Assistant so it loads the new integration.
 
 ### Method 2: HACS
 
@@ -67,16 +68,14 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
 3. Click "Install"
 4. Restart Home Assistant
 
-### Method 3: Manual Installation
+### Method 3: Development Symlink
 
-1. Copy the `custom_components/servo_cam` directory to your Home Assistant `custom_components` folder:
-   ```bash
-   cd /path/to/homeassistant
-   mkdir -p custom_components
-   cp -r /path/to/servo-cam/custom_components/servo_cam custom_components/
-   ```
+```bash
+cd /path/to/homeassistant/custom_components
+ln -s /path/to/servo-cam/custom_components/servo_cam servo_cam
+```
 
-2. Restart Home Assistant
+Restart Home Assistant after adding the symlink so the integration is discovered.
 
 ## Configuration
 

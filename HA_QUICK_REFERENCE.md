@@ -4,10 +4,9 @@ Fast lookup guide for common tasks.
 
 ## Installation
 
-1. **Add repository**: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
-2. **Install & start**: Select **Servo Cam** → Install → Start (optionally enable auto-start/watchdog)
-3. **Confirm discovery**: Keep `python3 main.py` or the add-on running so Zeroconf stays online, then accept the "New device discovered" prompt
-   - *`mode: local` targets Home Assistant OS/Supervised on Raspberry Pi (ARM). For x86 installs, set `mode: remote` and enter the Raspberry Pi address where you ran `install.sh`.*
+1. **Install integration**: Copy `custom_components/servo_cam` into your Home Assistant `custom_components` folder (or install via HACS) and restart Home Assistant.
+2. **Run backend**: Keep `servo-cam.service` (from `install.sh`) or `python3 main.py` running so Zeroconf stays online.
+3. **Confirm discovery**: Open Settings → Devices & Services and accept the **Servo Security Camera** discovery card. If dismissed, use **+ Add Integration → Servo Security Camera**.
 
 ## Entity IDs
 
@@ -284,7 +283,7 @@ Default connection:
 
 ---
 
-**Quick Start**: Add repo `https://github.com/lazarevtill/Servo-Cam` → Install & start add-on → Accept discovery prompt
+**Quick Start**: Copy `custom_components/servo_cam` into Home Assistant → Restart → Accept Servo Security Camera discovery
 
 **Common Use**: Turn on monitoring switch → Camera starts → View in dashboard → Move with presets
 

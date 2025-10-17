@@ -11,17 +11,7 @@ Spin up the Servo Cam platform, expose it to Home Assistant, and verify everythi
 
 ## Step 1: Install the Backend
 
-1. **Home Assistant Add-on (Recommended)**
-   - Go to **Settings → Add-ons → Add-on Store**
-   - Click the **⋮** menu → **Repositories** → add `https://github.com/lazarevtill/Servo-Cam`
-   - Install and start the **Servo Cam** add-on (optional: enable auto-start/watchdog)
-   - *Default `mode: local` runs on Home Assistant OS/Supervised for Raspberry Pi (ARM). For x86 or other hosts, set the add-on option `mode: remote` and point it at the Raspberry Pi where you ran `install.sh`.*
-
-   After installation, open the add-on configuration (gear icon) and:
-   - Leave `mode: local` when Home Assistant runs on the same Raspberry Pi as the camera/servos.
-   - Switch to `mode: remote` on x86/other platforms, then set `remote_host` (Pi IP/DNS) and `remote_port` (default 5000) before starting the add-on.
-
-2. **On-device install (Raspberry Pi)**
+1. **Automated install (Raspberry Pi, recommended)**
    ```bash
    cd /home/pi/Servo-Cam               # adjust to your clone location
    chmod +x install.sh
@@ -34,7 +24,7 @@ Spin up the Servo Cam platform, expose it to Home Assistant, and verify everythi
    - Writes `/etc/servo_cam/servo_cam.env` for runtime overrides
    - Registers and starts the `servo-cam.service` systemd unit
 
-3. **Development-only workflow**
+2. **Development-only workflow**
    ```bash
    sudo apt-get update
    sudo apt-get install -y python3 python3-venv python3-opencv i2c-tools
@@ -88,14 +78,19 @@ You should see the banner followed by:
 🌐 Server starting on http://0.0.0.0:5000
 ```
 
-## Step 4: Open the Web UI
+## Step 4: Install the Home Assistant Integration
+
+- Copy `custom_components/servo_cam` into your Home Assistant `config/custom_components/` folder (or install it via HACS as a custom repository).
+- Restart Home Assistant so the new integration is detected.
+
+## Step 5: Open the Web UI
 
 Visit `http://<raspberry-pi-ip>:5000` and confirm:
 - Live MJPEG video feed
 - Monitoring toggle (should show **Monitoring Active** after you start it)
 - Servo manual controls and patrol status
 
-## Step 5: Link with Home Assistant
+## Step 6: Link with Home Assistant
 
 - Keep the backend running (systemd service or manual session)
 - In Home Assistant, go to **Settings → Devices & Services**

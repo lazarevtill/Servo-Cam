@@ -565,9 +565,9 @@ The Home Assistant integration for Servo Security Camera is:
 
 ### Installation Checklist
 
-1. Add repository: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
-2. Install & start the **Servo Cam** add-on (enable auto-start/watchdog as desired)
-3. Confirm Zeroconf discovery in Settings → Devices & Services and finish the config flow
+1. Install the integration (`custom_components/servo_cam`) via manual copy or HACS and restart Home Assistant.
+2. Keep the Servo Cam backend running on your network (`servo-cam.service` or `python3 main.py`).
+3. Confirm Zeroconf discovery in Settings → Devices & Services and finish the config flow.
 
 ---
 

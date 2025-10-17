@@ -77,16 +77,17 @@ Full native Home Assistant integration with camera streaming, pan/tilt control, 
 
 ### Quick Installation
 
-1. Open **Settings → Add-ons → Add-on Store** in Home Assistant.
-2. Click the **⋮** menu → **Repositories** and add: `https://github.com/lazarevtill/Servo-Cam`.
-3. Install the **Servo Cam** add-on from the newly added repository.
-4. Start the add-on (optionally enable "Start on boot" and "Watchdog").
+1. Make sure the Servo Cam backend is running on your network (`install.sh` registers the `servo-cam.service`, or run `python3 main.py` while testing).
+2. Copy the Home Assistant integration from this repository into your Home Assistant config:
 
-> ℹ️ **Add-on modes**
-> - `local` (default): Runs the backend inside Home Assistant OS/Supervised on a Raspberry Pi (ARM) with direct camera/servo access.
-> - `remote`: For Home Assistant running on other architectures (e.g., x86/NUC). Set `mode: remote`, specify `remote_host` (Pi IP/DNS) and `remote_port` (default 5000). The add-on proxies all API calls to the Raspberry Pi where you executed `install.sh`, while still deploying the custom integration automatically.
+   ```bash
+   # From the servo-cam directory
+   cp -r custom_components/servo_cam /path/to/homeassistant/config/custom_components/
+   ```
 
-The add-on automatically installs/updates the bundled custom integration into `/config/custom_components/servo_cam` and exposes the Flask application on port 5000 by default.
+   (For development, you can symlink instead of copying.)
+3. Restart Home Assistant so it loads the custom integration.
+4. Open **Settings → Devices & Services**. The **Servo Security Camera** should appear under **Discovered**; click **Configure** to accept the Zeroconf prompt. If you previously dismissed the card, use **+ Add Integration → Servo Security Camera** and confirm the detected host/port.
 
 ### Features
 
@@ -157,12 +158,12 @@ source venv/bin/activate
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Optional: install the integration manually if you are not using the add-on
+# Install the Home Assistant integration
 mkdir -p ~/.homeassistant/custom_components
 cp -R custom_components/servo_cam ~/.homeassistant/custom_components/
 ```
 
-The manual steps mirror what the installer and add-on container perform. When running Home Assistant, the add-on keeps the backend and integration in sync automatically.
+Copying the integration ensures Home Assistant loads the Servo Security Camera integration. Restart Home Assistant afterwards so the new component is detected.
 
 ## 🚀 Usage
 
@@ -183,7 +184,7 @@ Access the web interface at: `http://<raspberry-pi-ip>:5000`
 
 ### Home Assistant Auto-Discovery
 
-With the integration installed in Home Assistant, simply keep `python3 main.py` running. The application advertises itself over Zeroconf (`_servo-cam._tcp.local.`), which triggers Home Assistant's **"New device discovered"** notification in **Settings → Devices & Services**. Review the detected host/port, click **Configure**, and the device is added instantly—no manual YAML required.
+With the integration installed in Home Assistant, keep the backend running (`servo-cam.service` or `python3 main.py`). The application advertises itself over Zeroconf (`_servo-cam._tcp.local.`), which triggers Home Assistant's **"New device discovered"** notification in **Settings → Devices & Services**. Review the detected host/port, click **Configure**, and the device is added instantly—no manual YAML required.
 
 ### Systemd Service (Auto-start)
 

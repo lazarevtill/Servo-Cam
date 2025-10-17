@@ -165,12 +165,12 @@ custom_components/servo_cam/
 - Security considerations
 - Future enhancements
 
-### 3. Home Assistant Add-on Repository
-**Files**: `repository.yaml`, `addons/servo_cam/*`
-- Standards-compliant add-on manifest (`config.yaml`, `build.yaml`)
-- Debian-based container with Python/OpenCV dependencies
-- Automatic custom integration deployment during container init
-- Service supervisor scripts for environment configuration and startup
+### 3. Home Assistant Integration Package
+**Files**: `custom_components/servo_cam/*`
+- Standalone custom integration ready for manual copy or HACS installation
+- Zeroconf discovery metadata (`manifest.json`)
+- Config flow, coordinator, entities, and services implemented in Python
+- Localised strings and documentation for quick onboarding
 
 ### 4. Main README Update
 **File**: `README.md` (updated)

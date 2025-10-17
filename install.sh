@@ -165,9 +165,9 @@ cat <<'EOF'
 Next steps:
   • Verify the service: sudo systemctl status servo-cam.service
   • View logs:        journalctl -u servo-cam.service -f
-  • In Home Assistant, add https://github.com/lazarevtill/Servo-Cam
-    as an add-on repository, install the "Servo Cam" add-on, and
-    complete the integration setup (auto-discovery or manual host/port).
+  • Keep the service running so the Zeroconf broadcast stays active.
+    In Home Assistant, open Settings → Devices & Services and accept
+    the Servo Security Camera discovery prompt (or Add Integration → Servo Security Camera).
 
 If you need to tweak runtime settings, edit /etc/servo_cam/servo_cam.env
 and run: sudo systemctl restart servo-cam.service
