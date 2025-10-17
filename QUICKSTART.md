@@ -22,6 +22,18 @@ The helper installs apt + pip dependencies, creates `.venv`, copies the Home Ass
 
 Need to target a different Home Assistant config? Use `HA_CONFIG_DIR=/path/to/config ./install.sh --systemd --start`.
 
+### Manual fallback (if you cannot run the helper)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y python3 python3-pip python3-venv \
+    i2c-tools libopencv-dev python3-opencv
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Home Assistant Add-on
 
 1. Open **Settings → Add-ons → Add-on Store**
@@ -64,6 +76,8 @@ source .venv/bin/activate
 python3 main.py
 ```
 
+You should see the startup banner with camera/servo initialization, webhook worker startup, Zeroconf advertisement, and the Flask server binding to `http://0.0.0.0:5000`.
+
 ## Step 4: Access Web Interface
 
 Open your browser to:
@@ -88,7 +102,7 @@ The system will now:
 - Include a base64 snapshot with each webhook
 - Compare the live scene with stored baselines for that angle and alert on unexpected changes
 
-> 💡 **Home Assistant**: Leave the backend running. Home Assistant shows a "New device discovered" prompt (Zeroconf). Accept it to add the integration instantly. No discovery? Click **+ Add Integration**, search for **Servo Security Camera**, and enter the Raspberry Pi host/IP and port 5000 manually.
+> 💡 **Home Assistant**: Leave the backend running. Home Assistant should raise a "New device discovered" prompt via Zeroconf. No discovery? Click **+ Add Integration**, search for **Servo Security Camera**, and enter the Raspberry Pi host/IP (default `servo-cam.local`) and port `5000` manually.
 
 ## Testing
 

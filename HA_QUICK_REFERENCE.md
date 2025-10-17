@@ -5,8 +5,8 @@ Fast lookup guide for common tasks.
 ## Installation
 
 1. **Add repository**: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
-2. **Install & start**: Select **Servo Cam** → Install → Start (or run `./install.sh --systemd --start` on the Raspberry Pi backend)
-3. **Connect Home Assistant**: Leave the backend running and accept the "New device discovered" prompt. No discovery? Use **+ Add Integration → Servo Security Camera** and enter the Pi host/IP + port 5000 manually.
+2. **Install & start**: Select **Servo Cam** → Install → Start (enable auto-start/watchdog as desired). Running outside the add-on? Execute `./install.sh --systemd --start` on the Raspberry Pi backend.
+3. **Connect Home Assistant**: Keep the backend online and accept the "New device discovered" prompt. No discovery? Use **+ Add Integration → Servo Security Camera** and enter the host/IP + port 5000 manually.
 
 ## Entity IDs
 
