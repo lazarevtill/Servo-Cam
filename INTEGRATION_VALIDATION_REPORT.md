@@ -563,20 +563,11 @@ The Home Assistant integration for Servo Security Camera is:
 **✅ Secure** - Appropriate for local deployment
 **✅ Maintainable** - Clean code, good structure
 
-### Installation Command
+### Installation Checklist
 
-```bash
-./install_ha_integration.sh
-```
-
-### Post-Installation
-
-1. Restart Home Assistant
-2. Go to Settings → Devices & Services
-3. Click "+ Add Integration"
-4. Search for "Servo Security Camera"
-5. Enter Raspberry Pi IP and port 5000
-6. Enjoy!
+1. Add repository: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
+2. Install & start the **Servo Cam** add-on (enable auto-start/watchdog as desired)
+3. Confirm Zeroconf discovery in Settings → Devices & Services and finish the config flow
 
 ---
 

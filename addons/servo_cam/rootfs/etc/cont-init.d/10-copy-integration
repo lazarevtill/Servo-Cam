@@ -1,0 +1,22 @@
+#!/usr/bin/with-contenv bashio
+# Copy the bundled custom integration into the Home Assistant configuration
+set -euo pipefail
+
+ADDON_NAME="Servo Cam"
+
+if ! bashio::fs.directory_exists "/config"; then
+    bashio::log.warning "Home Assistant config folder not mounted; skipping integration install."
+    exit 0
+fi
+
+TARGET_DIR="/config/custom_components/servo_cam"
+SOURCE_DIR="/usr/share/servo_cam/custom_components/servo_cam"
+
+bashio::log.info "Installing ${ADDON_NAME} integration files into ${TARGET_DIR}"
+rm -rf "${TARGET_DIR}"
+mkdir -p "${TARGET_DIR}"
+cp -a "${SOURCE_DIR}/." "${TARGET_DIR}/"
+
+# Ensure permissions allow Home Assistant to update if needed
+chown -R root:root "${TARGET_DIR}"
+chmod -R 755 "${TARGET_DIR}"

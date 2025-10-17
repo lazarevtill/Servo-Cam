@@ -1,0 +1,38 @@
+name: Servo Cam
+version: "0.2.0"
+slug: servo_cam
+description: Motorized security camera with automatic discovery and Home Assistant integration.
+url: https://github.com/lazarevtill/Servo-Cam
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: services
+boot: auto
+stage: stable
+init: false
+host_network: true
+i2c: true
+gpio: true
+udev: true
+panel_icon: mdi:cctv
+map:
+  - config:rw
+  - media:rw
+  - share:rw
+ports:
+  5000/tcp: 5000
+watchdog: http://[HOST]:5000/healthz
+options:
+  flask_port: 5000
+  flask_debug: false
+  webhook_url: "https://n8n.lazarev.cloud/webhook/738f9e56-ab1f-4654-9f76-b018bc14d695"
+schema:
+  flask_port: int(1024, 65535)
+  flask_debug: bool
+  webhook_url: str?
+privileged:
+  - SYS_RAWIO
+devices:
+  - /dev/i2c-1
+  - /dev/video0

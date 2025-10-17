@@ -165,17 +165,17 @@ custom_components/servo_cam/
 - Security considerations
 - Future enhancements
 
-### 3. Installation Script
-**File**: `install_ha_integration.sh`
-- Auto-detects HA installation
-- Interactive installation
-- Verification checks
-- Post-install instructions
+### 3. Home Assistant Add-on Repository
+**Files**: `repository.yaml`, `addons/servo_cam/*`
+- Standards-compliant add-on manifest (`config.yaml`, `build.yaml`)
+- Debian-based container with Python/OpenCV dependencies
+- Automatic custom integration deployment during container init
+- Service supervisor scripts for environment configuration and startup
 
 ### 4. Main README Update
 **File**: `README.md` (updated)
 - Added HA integration section
-- Quick installation steps
+- Quick installation steps (add-on + Raspberry Pi helper script)
 - Feature highlights
 - Documentation links
 

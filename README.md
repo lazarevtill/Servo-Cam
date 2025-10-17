@@ -10,6 +10,7 @@ A professional, production-ready security camera system for Raspberry Pi with mo
 - **🔔 Smart Webhook Notifications** - Priority-based alerts with 80-85% false positive reduction
 - **🧭 Scene Change Monitoring** - Brightness-normalized baseline comparisons per servo angle
 - **🚁 Autonomous Patrol Mode** - Camera continuously scans positions to monitor for scene changes
+- **📡 Zeroconf Discovery** - Home Assistant automatically prompts to add the device when the app is running
 - **🎮 Manual Control** - Web-based servo control with arrow buttons and sliders
 - **🔄 Monitoring Toggle** - Easily enable/disable security monitoring mode
 - **⚡ Optimized Performance** - Memory-efficient design for Raspberry Pi's limited resources
@@ -76,15 +77,12 @@ Full native Home Assistant integration with camera streaming, pan/tilt control, 
 
 ### Quick Installation
 
-```bash
-# Run the Home Assistant installation script
-./install_ha_integration.sh
-```
+1. Open **Settings → Add-ons → Add-on Store** in Home Assistant.
+2. Click the **⋮** menu → **Repositories** and add: `https://github.com/lazarevtill/Servo-Cam`.
+3. Install the **Servo Cam** add-on from the newly added repository.
+4. Start the add-on (optionally enable "Start on boot" and "Watchdog").
 
-The script will:
-- Detect your Home Assistant installation
-- Copy integration files to `custom_components/`
-- Guide you through setup
+The add-on automatically installs/updates the bundled custom integration into `/config/custom_components/servo_cam` and exposes the Flask application on port 5000 by default.
 
 ### Features
 
@@ -112,56 +110,39 @@ See **[HOMEASSISTANT_INTEGRATION.md](HOMEASSISTANT_INTEGRATION.md)** for complet
 
 ```bash
 # Clone the repository
-cd /root/servo-cam-main
+cd ~/Servo-Cam
 
-# Run installation script
-chmod +x install.sh
-./install.sh
+# Provision dependencies, sync the HA integration, and start the backend immediately
+./install.sh --start
 
-# The script will:
-# - Install system dependencies
-# - Enable I2C and camera
-# - Create Python virtual environment
-# - Install Python packages
-# - Create systemd service
+# (Optional) Install + enable the systemd unit and restart it right away
+./install.sh --systemd --start
 ```
+
+The installer detects your Home Assistant configuration directory (default `~/.homeassistant`) and keeps the local integration copy in sync. Override the path by exporting `HA_CONFIG_DIR=/path/to/config` or passing `--ha-config`. When `--start` is supplied the Flask service launches in the background (logs at `logs/servo_cam.log`).
 
 ### Manual Installation
 
-```bash
-# Install system dependencies
-sudo apt-get update
-sudo apt-get install -y python3 python3-pip python3-venv \
-    i2c-tools libopencv-dev python3-opencv
-
-# Enable I2C
-sudo raspi-config
-# Navigate to: Interface Options → I2C → Enable
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-```
+The helper script performs the same steps that were previously listed manually (apt packages, virtual environment setup, dependency installation, and integration copy). When the Home Assistant add-on is available, prefer that route to keep the integration and backend in sync automatically. Use the script when running directly on a Raspberry Pi or for development workstations where you need a local backend.
 
 ## 🚀 Usage
 
 ### Running the System
 
 ```bash
-# Activate virtual environment
-source venv/bin/activate
-
-# Start the server
+# If you did not use --start, launch the backend manually
+source .venv/bin/activate
 python3 main.py
 
 # Or run directly
 ./main.py
 ```
 
-Access the web interface at: `http://<raspberry-pi-ip>:5000`
+Access the web interface at: `http://<raspberry-pi-ip>:5000`. If you used `./install.sh --start`, the service is already running—check with `curl http://<raspberry-pi-ip>:5000/healthz` and tail background logs via `tail -f logs/servo_cam.log`.
+
+### Home Assistant Auto-Discovery
+
+With the integration installed in Home Assistant, simply keep `python3 main.py` (or the systemd service/add-on) running. The application advertises itself over Zeroconf (`_servo-cam._tcp.local.`), which triggers Home Assistant's **"New device discovered"** notification in **Settings → Devices & Services**. Review the detected host/port, click **Configure**, and the device is added instantly—no manual YAML required. If your network blocks Zeroconf/mDNS broadcasts, click **+ Add Integration**, search for **Servo Security Camera**, and provide the Raspberry Pi host/IP and port (default `5000`).
 
 ### Systemd Service (Auto-start)
 
@@ -398,6 +379,13 @@ sudo i2cdetect -y 1
 sudo i2cget -y 1 0x40 0x00
 ```
 
+### Home Assistant Doesn't Discover the Device
+
+1. Verify the Python dependencies include `zeroconf` (inside the same venv used to launch `main.py`).
+2. Confirm the console output shows `✓ Zeroconf advertisement started` after the app boots.
+3. Make sure Home Assistant and the Raspberry Pi are on the same subnet with mDNS traffic allowed.
+4. Open **Settings → Devices & Services** and click **Check for new devices** if the prompt does not appear automatically.
+
 ### Performance Issues
 
 ```bash
@@ -516,6 +504,10 @@ For issues or questions:
 - Check troubleshooting section above
 - Review logs: `sudo journalctl -u security-cam -f`
 - Test components individually (camera, I2C, servos)
+
+## 📄 License
+
+Released under the [GNU Affero General Public License v3.0](LICENSE). If you modify and run Servo-Cam for others over a network, you must provide access to your source code and keep the original copyright and license notices intact.
 
 ---
 

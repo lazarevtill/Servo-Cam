@@ -45,7 +45,14 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
 
 ## Installation
 
-### Method 1: HACS (Recommended)
+### Method 1: Home Assistant Add-on (Recommended)
+
+1. Settings → Add-ons → Add-on Store → ⋮ → Repositories
+2. Add `https://github.com/lazarevtill/Servo-Cam`
+3. Install and start the **Servo Cam** add-on (enable auto-start/watchdog as desired)
+4. The add-on copies this integration into `/config/custom_components/servo_cam` automatically on every boot
+
+### Method 2: HACS
 
 1. Ensure [HACS](https://hacs.xyz/) is installed
 2. Add this repository as a custom repository in HACS:
@@ -53,12 +60,12 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
    - Click "Integrations"
    - Click the three dots menu (top right)
    - Select "Custom repositories"
-   - Add repository URL: `https://github.com/lazarevtill/servo-cam`
+   - Add repository URL: `https://github.com/lazarevtill/Servo-Cam`
    - Category: Integration
 3. Click "Install"
 4. Restart Home Assistant
 
-### Method 2: Manual Installation
+### Method 3: Manual Installation
 
 1. Copy the `custom_components/servo_cam` directory to your Home Assistant `custom_components` folder:
    ```bash
@@ -69,17 +76,18 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
 
 2. Restart Home Assistant
 
+> 💡 Tip: Running `./install.sh --systemd --start` from the project root on your Raspberry Pi performs this copy automatically, provisions dependencies, and keeps the backend running. Use `HA_CONFIG_DIR=/path/to/config ./install.sh --systemd --start` to target a different Home Assistant configuration directory.
+
 ## Configuration
 
 ### Setup via UI (Recommended)
 
 1. Go to **Settings** → **Devices & Services**
-2. Click **+ Add Integration**
-3. Search for "Servo Security Camera"
-4. Enter connection details:
-   - **Host**: IP address or hostname of your Raspberry Pi (default: `localhost`)
+2. If the Zeroconf discovery prompt appears, click **Configure**. Otherwise click **+ Add Integration** and search for "Servo Security Camera".
+3. Enter or confirm connection details:
+   - **Host**: IP address or hostname of your Raspberry Pi (default: `servo-cam.local`; change to your Pi's IP if needed)
    - **Port**: API port (default: `5000`)
-5. Click **Submit**
+4. Click **Submit**
 
 The integration will automatically discover and configure all entities.
 

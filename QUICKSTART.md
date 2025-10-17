@@ -11,13 +11,24 @@ Get your security camera up and running in 5 minutes!
 
 ## Step 1: Installation
 
+### Raspberry Pi Deployment (recommended)
+
 ```bash
-cd /root/servo-cam-main
-chmod +x install.sh
-./install.sh
+cd ~/Servo-Cam
+./install.sh --systemd --start   # Provision, install, register systemd, and start immediately
 ```
 
-Wait for installation to complete (5-10 minutes). Reboot if prompted.
+The helper installs apt + pip dependencies, creates `.venv`, copies the Home Assistant integration into your config directory (`~/.homeassistant` by default), and keeps the backend running. Logs are written to `logs/servo_cam.log`.
+
+Need to target a different Home Assistant config? Use `HA_CONFIG_DIR=/path/to/config ./install.sh --systemd --start`.
+
+### Home Assistant Add-on
+
+1. Open **Settings → Add-ons → Add-on Store**
+2. Click **⋮ → Repositories** and add `https://github.com/lazarevtill/Servo-Cam`
+3. Install & start **Servo Cam** (enable auto-start/watchdog if desired)
+
+> ⚠️ Hardware access is exclusive—run either the add-on or the standalone service, not both simultaneously.
 
 ## Step 2: Configuration
 
@@ -37,29 +48,26 @@ Or use environment variable:
 export WEBHOOK_URL="https://your-webhook-url.com/endpoint"
 ```
 
-## Step 3: Test Run
+## Step 3: Verify the Backend
+
+If you used `--start`, the service is already running. Confirm with:
 
 ```bash
-source venv/bin/activate
+curl http://localhost:5000/healthz
+tail -f logs/servo_cam.log
+```
+
+Manual launch remains available:
+
+```bash
+source .venv/bin/activate
 python3 main.py
-```
-
-You should see:
-```
-============================================================
-SECURITY CAMERA SYSTEM
-============================================================
-
-✓ Camera initialized
-✓ Servos initialized and centered
-✓ Webhook notifications enabled
-...
-🌐 Server starting on http://0.0.0.0:5000
 ```
 
 ## Step 4: Access Web Interface
 
-Open your browser:
+Open your browser to:
+
 ```
 http://<raspberry-pi-ip>:5000
 ```
@@ -74,11 +82,13 @@ You should see:
 Click the **"Start Monitoring"** button in the web interface.
 
 The system will now:
-- Detect motion in the camera view
-- Track objects with servos
-- Send webhooks when servos move significantly (>5°)
-- Include snapshot with each webhook
+- Detect motion in the camera view (for overlays, intelligence, and webhook payloads)
+- Continue autonomous patrol scanning across the configured pan/tilt grid (servos do **not** follow motion targets)
+- Send webhooks when patrol movement exceeds the configured thresholds or when scene-change analysis flags a difference
+- Include a base64 snapshot with each webhook
 - Compare the live scene with stored baselines for that angle and alert on unexpected changes
+
+> 💡 **Home Assistant**: Leave the backend running. Home Assistant shows a "New device discovered" prompt (Zeroconf). Accept it to add the integration instantly. No discovery? Click **+ Add Integration**, search for **Servo Security Camera**, and enter the Raspberry Pi host/IP and port 5000 manually.
 
 ## Testing
 
@@ -93,7 +103,7 @@ The system will now:
 1. Click "Start Monitoring"
 2. Badge should change to "🔴 MONITORING ACTIVE"
 3. Move your hand in front of camera
-4. Servos should track the movement
+4. Watch the console or web UI overlay to confirm motion is detected (servos stay in patrol sequence)
 5. Check your webhook endpoint for notifications
 
 ## Troubleshooting
@@ -133,21 +143,21 @@ sudo i2cget -y 1 0x40 0x00
 
 ## Enable Auto-Start
 
+If you did not run `./install.sh --systemd`, you can still enable the service manually:
+
 ```bash
 sudo systemctl enable security-cam
 sudo systemctl start security-cam
-```
 
-Check status:
-```bash
+# Check status
 sudo systemctl status security-cam
 ```
 
 ## Key Features
 
 ### Monitoring Toggle
-- **ON**: Motion tracking active, webhooks sent on servo movement
-- **OFF**: Manual control only, no webhooks
+- **ON**: Motion detection, intelligent analysis, autonomous patrol, scene-change monitoring, and webhooks are active
+- **OFF**: Manual control only, no monitoring or webhooks
 
 ### Manual Control
 - Arrow buttons: Move servos in small/large steps
@@ -157,8 +167,8 @@ sudo systemctl status security-cam
 ### Webhook Triggers
 Webhooks are sent when:
 - Monitoring is active
-- Motion is detected
-- Servo angle changes by ≥5° (configurable)
+- Motion intelligence marks an event that meets the threat filters
+- Patrol movement changes pan/tilt angles by ≥5° (configurable)
 - The scene at the current servo angle differs from the stored baseline beyond configured thresholds
 - Includes base64-encoded snapshot
 

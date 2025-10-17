@@ -8,7 +8,7 @@ CONF_HOST = "host"
 CONF_PORT = "port"
 
 # Defaults
-DEFAULT_HOST = "localhost"
+DEFAULT_HOST = "servo-cam.local"
 DEFAULT_PORT = 5000
 
 # Update intervals
