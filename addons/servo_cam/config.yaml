@@ -5,8 +5,8 @@ description: Motorized security camera with automatic discovery and Home Assista
 url: https://github.com/lazarevtill/Servo-Cam
 arch:
   - aarch64
-  - amd64
   - armv7
+  - amd64
 startup: services
 boot: auto
 stage: stable
@@ -24,13 +24,21 @@ ports:
   5000/tcp: 5000
 watchdog: http://[HOST]:5000/healthz
 options:
+  mode: local
   flask_port: 5000
   flask_debug: false
   webhook_url: "https://n8n.lazarev.cloud/webhook/738f9e56-ab1f-4654-9f76-b018bc14d695"
+  remote_host: ""
+  remote_port: 5000
+  remote_scheme: http
 schema:
+  mode: list(local|remote)
   flask_port: int(1024, 65535)
   flask_debug: bool
   webhook_url: str?
+  remote_host: str?
+  remote_port: int(1, 65535)?
+  remote_scheme: list(http|https)?
 privileged:
   - SYS_RAWIO
 devices:

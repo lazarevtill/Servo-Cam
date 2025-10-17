@@ -99,6 +99,23 @@ pip install -r "${ROOT_DIR}/requirements.txt"
 deactivate
 
 SERVICE_USER="${SUDO_USER:-$USER}"
+
+# If repository lives under /root we must run the service as root (other users
+# cannot traverse /root even with recursive ownership changes).
+if [[ "${SERVICE_USER}" != "root" && "${ROOT_DIR}" == /root/* ]]; then
+    log "Working directory is under /root; running service as root for accessibility."
+    SERVICE_USER="root"
+fi
+
+# Double-check that the chosen service user can access the working directory;
+# fall back to root otherwise.
+if [[ "${SERVICE_USER}" != "root" ]]; then
+    if ! su -s /bin/sh "${SERVICE_USER}" -c "test -r '${ROOT_DIR}' && test -x '${ROOT_DIR}'" >/dev/null 2>&1; then
+        log "User '${SERVICE_USER}' cannot access ${ROOT_DIR}; falling back to root."
+        SERVICE_USER="root"
+    fi
+fi
+
 SERVICE_GROUP="$(id -gn "${SERVICE_USER}")"
 
 log "Writing environment configuration to ${ENV_FILE}"

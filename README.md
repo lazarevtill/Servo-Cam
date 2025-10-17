@@ -82,6 +82,10 @@ Full native Home Assistant integration with camera streaming, pan/tilt control, 
 3. Install the **Servo Cam** add-on from the newly added repository.
 4. Start the add-on (optionally enable "Start on boot" and "Watchdog").
 
+> ℹ️ **Add-on modes**
+> - `local` (default): Runs the backend inside Home Assistant OS/Supervised on a Raspberry Pi (ARM) with direct camera/servo access.
+> - `remote`: For Home Assistant running on other architectures (e.g., x86/NUC). Set `mode: remote`, specify `remote_host` (Pi IP/DNS) and `remote_port` (default 5000). The add-on proxies all API calls to the Raspberry Pi where you executed `install.sh`, while still deploying the custom integration automatically.
+
 The add-on automatically installs/updates the bundled custom integration into `/config/custom_components/servo_cam` and exposes the Flask application on port 5000 by default.
 
 ### Features

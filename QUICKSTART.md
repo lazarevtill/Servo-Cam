@@ -15,6 +15,11 @@ Spin up the Servo Cam platform, expose it to Home Assistant, and verify everythi
    - Go to **Settings → Add-ons → Add-on Store**
    - Click the **⋮** menu → **Repositories** → add `https://github.com/lazarevtill/Servo-Cam`
    - Install and start the **Servo Cam** add-on (optional: enable auto-start/watchdog)
+   - *Default `mode: local` runs on Home Assistant OS/Supervised for Raspberry Pi (ARM). For x86 or other hosts, set the add-on option `mode: remote` and point it at the Raspberry Pi where you ran `install.sh`.*
+
+   After installation, open the add-on configuration (gear icon) and:
+   - Leave `mode: local` when Home Assistant runs on the same Raspberry Pi as the camera/servos.
+   - Switch to `mode: remote` on x86/other platforms, then set `remote_host` (Pi IP/DNS) and `remote_port` (default 5000) before starting the add-on.
 
 2. **On-device install (Raspberry Pi)**
    ```bash

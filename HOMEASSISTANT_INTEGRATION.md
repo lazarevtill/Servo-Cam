@@ -23,7 +23,20 @@ This integration provides full control and monitoring of your Servo Security Cam
 2. Open the **⋮** menu → **Repositories** and add `https://github.com/lazarevtill/Servo-Cam`.
 3. Select **Servo Cam** → **Install** → **Start** (enable auto-start/watchdog if desired).
 
+> ⚙️ **Add-on modes**: `mode: local` (default) runs the backend inside Home Assistant OS/Supervised on Raspberry Pi (ARM). For x86/other hosts, set `mode: remote`, provide the Raspberry Pi address/port (where `install.sh` was executed), and the add-on will proxy the remote backend while keeping the integration updated.
+
 The add-on automatically copies the integration into `/config/custom_components/servo_cam` on every boot and keeps the backend service running.
+
+##### Add-on configuration options
+
+| Option | Description |
+|--------|-------------|
+| `mode` | `local` (run backend inside add-on) or `remote` (proxy to existing Raspberry Pi backend) |
+| `flask_port` | Port exposed by the add-on container (default 5000) |
+| `remote_host` | Hostname/IP of the Raspberry Pi when using remote mode |
+| `remote_port` | Remote backend port (default 5000) |
+| `remote_scheme` | `http` (default) or `https` when reverse proxying a secured backend |
+| `webhook_url` | Optional override for webhook target when running in local mode |
 
 #### Option B: Manual Filesystem Installation
 

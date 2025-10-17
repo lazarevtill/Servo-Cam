@@ -52,6 +52,8 @@ A comprehensive Home Assistant integration for the Servo Security Camera system 
 3. Install and start the **Servo Cam** add-on (enable auto-start/watchdog as desired)
 4. The add-on copies this integration into `/config/custom_components/servo_cam` automatically on every boot
 
+> Add-on modes: use `local` on Home Assistant OS/Supervised for Raspberry Pi (ARM). For other Home Assistant platforms (e.g., x86/NUC), choose `remote` in the add-on options and point it to the Raspberry Pi where `install.sh` deployed the backend.
+
 ### Method 2: HACS
 
 1. Ensure [HACS](https://hacs.xyz/) is installed

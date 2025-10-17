@@ -7,6 +7,7 @@ Fast lookup guide for common tasks.
 1. **Add repository**: Settings → Add-ons → Add-on Store → ⋮ → Repositories → `https://github.com/lazarevtill/Servo-Cam`
 2. **Install & start**: Select **Servo Cam** → Install → Start (optionally enable auto-start/watchdog)
 3. **Confirm discovery**: Keep `python3 main.py` or the add-on running so Zeroconf stays online, then accept the "New device discovered" prompt
+   - *`mode: local` targets Home Assistant OS/Supervised on Raspberry Pi (ARM). For x86 installs, set `mode: remote` and enter the Raspberry Pi address where you ran `install.sh`.*
 
 ## Entity IDs
 
